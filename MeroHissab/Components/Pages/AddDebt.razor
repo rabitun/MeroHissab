@@ -1,0 +1,257 @@
+﻿@page "/adddebtsource"
+
+<h3 style="color: #050552; font-family: Arial, sans-serif; font-weight: bold; text-align: center;">Debt Management</h3>
+
+<!-- Button to Open Modal -->
+<div style="text-align: center; margin-bottom: 20px;">
+    <button @onclick="OpenModal" style="padding: 10px 20px; background-color: #2A3B5F; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease;">
+        Add Debt
+    </button>
+</div
+
+<!-- Modal for Adding Debt Source -->
+@if (IsModalOpen)
+
+{
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; font-family: 'Arial', sans-serif;">
+        <div style="background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2); width: 420px; max-width: 100%; position: relative; opacity: 1; transform: scale(1); transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;">
+            <!-- Close Button -->
+            <button @onclick="CloseModal"
+                    style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 28px; font-weight: bold; cursor: pointer; color: #666; transition: color 0.2s ease;">
+                &times;
+            </button>
+
+            <!-- Title -->
+            <h4 style="font-size: 24px; margin-bottom: 20px; font-weight: bold; color: #333; text-align: center; line-height: 1.3;">Add New Debt</h4>
+
+            <form @onsubmit="SaveDebtSource">
+                <!-- Debt Source and Debt Amount -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333;">Debt Source</label>
+                        <input type="text" @bind="NewDebt.DebtSource" placeholder="Enter debt source"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: #f9f9f9; transition: border-color 0.2s ease;" required />
+                    </div>
+
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333;">Debt Amount</label>
+                        <input type="number" @bind="NewDebt.DebtAmount" placeholder="Enter amount"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: #f9f9f9; transition: border-color 0.2s ease;" required />
+                    </div>
+                </div>
+
+                <!-- Debt Due Date -->
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333;">Debt Due Date</label>
+                    <input type="date" @bind="NewDebt.DueDate"
+                           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: #f9f9f9; transition: border-color 0.2s ease;" required />
+                </div>
+
+                <!-- Description -->
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333;">Description</label>
+                    <textarea @bind="NewDebt.Description" placeholder="Enter description"
+                              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background-color: #f9f9f9; transition: border-color 0.2s ease;" rows="3"></textarea>
+                </div>
+
+                <!-- Save Button -->
+                <div style="display: flex; justify-content: center;">
+                    <button type="submit"
+                            style="padding: 12px 50px; background-color: #050552; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: medium; cursor: pointer; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); transition: background-color 0.2s ease;">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+}
+
+<h4 style="color: #2A3B5F; font-family: Arial, sans-serif; font-weight: bold; margin-top: 30px;">Debt Records</h4>
+@if (Debts.Any())
+
+{
+    <table class="debt-table" style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+        <thead>
+            <tr style="background-color: #050552; color: white;">
+                <th style="padding: 8px; border: 1px solid #ddd;">Debt Source</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Amount</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Due Date</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var debt in Debts)
+
+            {
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">@debt.DebtSource</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">@debt.DebtAmount</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">@debt.DueDate.ToString("MM/dd/yyyy")</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">
+                        @(debt.DebtAmount > 0 ? "Pending" : "Cleared")
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">
+                        @if (debt.DebtAmount > 0)
+
+                        {
+                            <button @onclick="() => ClearDebt(debt)" style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px;">
+                                Clear my Debt
+                            </button>
+                        }
+
+                        else
+
+                        {
+                            <span>Cleared</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+else
+
+{
+    <p>No debts recorded yet.</p>
+}
+
+@code {
+    private bool IsModalOpen { get; set; } = false;
+
+
+
+    private void OpenModal()
+
+    {
+
+        IsModalOpen = true;
+
+    }
+
+
+
+    private void CloseModal()
+
+    {
+
+        IsModalOpen = false;
+
+    }
+
+
+
+    private async Task ClearDebt(Debt debt)
+
+    {
+
+        if (debt.DebtAmount > 0)
+
+        {
+
+            debt.DebtAmount = 0; // Clear the debt
+
+            await SaveDebtsToJson(); // Save changes
+
+            StateHasChanged(); // Update UI
+
+        }
+
+    }
+
+
+
+    private Debt NewDebt { get; set; } = new Debt
+        {
+            DebtSource = string.Empty,
+            DebtAmount = 0,
+            DueDate = DateTime.Now,
+            Description = string.Empty
+        };
+
+
+
+    private List<Debt> Debts { get; set; } = new List<Debt>();
+
+
+    static string DebtFilePath = "debt.json";
+
+    static string debt_Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DebtFilePath);
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        Debts = await LoadDebtsFromJson();
+
+    }
+
+
+
+    private async Task<List<Debt>> LoadDebtsFromJson()
+
+    {
+
+        if (System.IO.File.Exists(debt_Path))
+
+        {
+
+            string jsonString = await System.IO.File.ReadAllTextAsync(debt_Path);
+
+            return System.Text.Json.JsonSerializer.Deserialize<List<Debt>>(jsonString) ?? new List<Debt>();
+
+        }
+
+        return new List<Debt>();
+
+    }
+
+
+
+    private async Task SaveDebtSource()
+
+    {
+
+        Debts.Add(NewDebt);
+
+        await SaveDebtsToJson();
+
+        NewDebt = new Debt { DebtSource = string.Empty, DebtAmount = 0, DueDate = DateTime.Now, Description = string.Empty };
+
+        StateHasChanged();
+
+    }
+
+
+
+    private async Task SaveDebtsToJson()
+
+    {
+
+        string jsonString = System.Text.Json.JsonSerializer.Serialize(Debts, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+        await System.IO.File.WriteAllTextAsync(debt_Path, jsonString);
+
+    }
+
+
+
+    public class Debt
+
+    {
+
+        public string DebtSource { get; set; } = string.Empty;
+
+        public decimal DebtAmount { get; set; }
+
+        public DateTime DueDate { get; set; }
+
+        public string Description { get; set; } = string.Empty;
+
+    }
+}  

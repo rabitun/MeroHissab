@@ -1,0 +1,124 @@
+﻿@page "/transactions"
+@inject IJSRuntime JSRuntime
+
+<div style="padding: 20px; background-color: #ffffff; min-height: 100vh;">
+    <h3 style="font-family: Arial, sans-serif; color: #050552; text-align: center; margin-top: 20px;">Transactions</h3>
+
+    <div style="margin-bottom: 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+        <input @bind="SearchQuery" type="text" placeholder="Search by Title"
+               style="padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; color: #050552;">
+
+        <select @bind="FilterType" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; color: #050552;">
+            <option value="">All Types</option>
+            <option value="INFLOW">INFLOW</option>
+            <option value="OUTFLOW">OUTFLOW</option>
+        </select>
+
+        <input type="date" @bind="StartDate" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; color: #050552;">
+        <input type="date" @bind="EndDate" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; color: #050552;">
+
+        <button @onclick="FilterTransactions" style="padding: 10px 20px; background-color: #050552; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            SEARCH
+        </button>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-family: Arial, sans-serif;">
+        <thead>
+            <tr style="background-color: #050552; color: white;">
+                <th style="padding: 12px; border: 1px solid #ccc; color: white;">Date</th>
+                <th style="padding: 12px; border: 1px solid #ccc; color: white;">Title</th>
+                <th style="padding: 12px; border: 1px solid #ccc; color: white;">Transaction Amount</th>
+                <th style="padding: 12px; border: 1px solid #ccc; color: white;">Transaction Type</th>
+                <th style="padding: 12px; border: 1px solid #ccc; color: white;">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (FilteredTransactions.Any())
+            {
+                foreach (var transaction in FilteredTransactions)
+                {
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ccc; color: #050552;">@transaction.Date.ToShortDateString()</td>
+                        <td style="padding: 10px; border: 1px solid #ccc; color: #050552;">@transaction.Title</td>
+                        <td style="padding: 10px; border: 1px solid #ccc; color: #050552;">@transaction.Amount</td>
+                        <td style="padding: 10px; border: 1px solid #ccc; color: #050552;">@transaction.Type</td>
+                        <td style="padding: 10px; border: 1px solid #ccc; color: #050552;">@transaction.Notes</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" style="padding: 10px; text-align: center; border: 1px solid #ccc; color: #050552;">No transactions found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private string SearchQuery { get; set; } = string.Empty;
+    private string FilterType { get; set; } = string.Empty;
+    private string FilterTag { get; set; } = string.Empty;
+    private DateTime? StartDate { get; set; }
+    private DateTime? EndDate { get; set; }
+    private List<Transaction> Transactions { get; set; } = new();
+    private List<Transaction> FilteredTransactions { get; set; } = new();
+    private List<string> Tags => Transactions.Select(t => t.Tag).Distinct().ToList();
+    private bool SortAscending { get; set; } = true;
+
+    private string InflowFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "cash_inflow.json");
+    private string OutflowFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "cash_outflow.json");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTransactions();
+        FilteredTransactions = Transactions;
+    }
+
+    private async Task LoadTransactions()
+    {
+        var inflows = await LoadFromFile(InflowFilePath, "INFLOW");
+        var outflows = await LoadFromFile(OutflowFilePath, "OUTFLOW");
+        Transactions = inflows.Concat(outflows).ToList();
+    }
+
+    private async Task<List<Transaction>> LoadFromFile(string filePath, string type)
+    {
+        if (System.IO.File.Exists(filePath))
+        {
+            var jsonString = await System.IO.File.ReadAllTextAsync(filePath);
+            var data = System.Text.Json.JsonSerializer.Deserialize<List<Transaction>>(jsonString) ?? new List<Transaction>();
+            data.ForEach(t => t.Type = type); // Set type dynamically
+            return data;
+        }
+        return new List<Transaction>();
+    }
+
+    private void FilterTransactions()
+    {
+        FilteredTransactions = Transactions
+            .Where(t => string.IsNullOrEmpty(SearchQuery) || t.Title.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+            .Where(t => string.IsNullOrEmpty(FilterType) || t.Type == FilterType)
+            .Where(t => string.IsNullOrEmpty(FilterTag) || t.Tag == FilterTag)
+            .Where(t => !StartDate.HasValue || t.Date >= StartDate.Value)
+            .Where(t => !EndDate.HasValue || t.Date <= EndDate.Value)
+            .OrderBy(t => SortAscending ? t.Date : t.Date).ToList();
+    }
+
+    private void ToggleSortOrder()
+    {
+
+        FilterTransactions();
+    }
+
+    public class Transaction
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string Tag { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public string Notes { get; set; } = string.Empty;
+    }
+}

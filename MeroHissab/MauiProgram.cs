@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MeroHissab.Services;
 
 namespace MeroHissab
 {
@@ -17,8 +18,9 @@ namespace MeroHissab
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
+            builder.Services.AddSingleton<ITransactionService, TransactionService>();
 #endif
 
             return builder.Build();

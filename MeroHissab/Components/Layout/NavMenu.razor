@@ -1,26 +1,47 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar navbar-dark" style="background-color: #0F0F30;">
     <div class="container-fluid">
         <a class="navbar-brand" href="">MeroHissab</a>
+
     </div>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()" style="background-color: #050552;">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="dashboard">
+                <span aria-hidden="true"></span> Dashboard
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="cashinflow">
+                <span aria-hidden="true"></span> Cash Inflow
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="cashoutflow">
+                <span aria-hidden="true"></span> Cash Outflow
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="adddebtsource">
+                <span aria-hidden="true"></span> Debt Tracking
+            </NavLink>
+        </div>
+        <!-- New Debt Management Link -->
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/transactions">
+                <span aria-hidden="true"></span> Transaction
+            </NavLink>
+        </div>
+
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span aria-hidden="true"></span> LogOut
             </NavLink>
         </div>
     </nav>

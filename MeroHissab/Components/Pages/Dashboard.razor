@@ -1,0 +1,448 @@
+﻿@page "/dashboard"
+
+<section style="padding: 30px; background-color: #f5f5f5;">
+    <h2 class="dashboard-title"><b>Details of the money</b></h2>
+
+    <div class="dashboard-container">
+        <!-- 2x2 grid for the cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h5>Total Inflows <i class="fas fa-arrow-up inflow-icon"></i></h5>
+                <p class="dashboard-value">@TotalInflows</p>
+            </div>
+            <div class="dashboard-card">
+                <h5>Total Outflows <i class="fas fa-arrow-down outflow-icon"></i></h5>
+                <p class="dashboard-value">@TotalOutflows</p>
+            </div>
+            <div class="dashboard-card">
+                <h5>Available Balance <i class="fas fa-wallet balance-icon"></i></h5>
+                <p class="dashboard-value">@AvailableBalance</p>
+            </div>
+            <div class="dashboard-card">
+                <h5>Total Debt <i class="fas fa-sack-dollar debt-icon"></i></h5>
+                <p class="dashboard-value">@TotalDebt</p>
+            </div>
+        </div>
+
+
+        <!-- Transaction report on the right side -->
+        <div class="transaction-section">
+            <h4><b>Transaction Records</b></h4>
+            <div class="transaction-details">
+                <div>
+                    <h5><b>Inflow Details</b></h5>
+                    <ul>
+                        <li>Highest Inflow: @HighestInflow</li>
+                        <li>Lowest Inflow: @LowestInflow</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5><b>Outflow Details</b></h5>
+                    <ul>
+                        <li>Highest Outflow: @HighestOutflow</li>
+                        <li>Lowest Outflow: @LowestOutflow</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5><b>Debt Details</b></h5>
+                    <ul>
+                        <li>Highest Debt: @HighestDebt</li>
+                        <li>Lowest Debt: @LowestDebt</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+    <!-- Pending and Cleared Debts -->
+    <div>
+        <h4>Pending Debts</h4>
+        @if (PendingDebts.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Debt Source</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var debt in PendingDebts)
+                    {
+                        <tr>
+                            <td>@debt.DebtSource</td>
+                            <td>@debt.DebtAmount</td>
+                            <td>@debt.DueDate.ToString("d")</td>
+                            <td><span class="badge badge-pending">Pending</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="no-data">No pending debts.</p>
+        }
+    </div>
+
+    <div>
+        <h4>Cleared Debts</h4>
+        @if (ClearedDebts.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Debt Source</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var debt in ClearedDebts)
+                    {
+                        <tr>
+                            <td>@debt.DebtSource</td>
+                            <td>@debt.DebtAmount</td>
+                            <td>@debt.DueDate.ToString("d")</td>
+                            <td><span class="badge badge-cleared">Cleared</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="no-data">No cleared debts.</p>
+        }
+    </div>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #050552;
+        }
+
+        .dashboard {
+            padding: 30px;
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #050552;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+
+        .dashboard-card {
+            background-color: cornflowerblue;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+            .dashboard-card h5 {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+            .dashboard-card .dashboard-value {
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+        .inflow-icon {
+            color: green;
+        }
+
+        .outflow-icon {
+            color: red;
+        }
+
+        .balance-icon {
+            color: #3498db;
+        }
+
+        .debt-icon {
+            color: #f39c12;
+        }
+
+        .transaction-section {
+            flex: 1;
+            margin-left: 20px;
+            background-color: cornflowerblue;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+            .transaction-section h4 {
+                font-size: 24px;
+                color: #050552;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+            .transaction-details div {
+                background: #ffffff;
+                padding: 15px;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+            .table thead th {
+                background-color: #050552;
+                color: white;
+                padding: 10px;
+            }
+
+            .table tbody td {
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                text-align: center;
+            }
+
+        .badge {
+            padding: 5px 10px;
+            color: white;
+            border-radius: 5px;
+            font-size: 0.8em;
+        }
+
+        .badge-cleared {
+            background-color: green;
+        }
+
+        .badge-pending {
+            background-color: red;
+        }
+
+        .no-data {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+        }
+    </style>
+
+
+    <h4>Cleared Debts</h4>
+    @if (ClearedDebts.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Debt Source</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var debt in ClearedDebts)
+                {
+                    <tr>
+                        <td>@debt.DebtSource</td>
+                        <td>@debt.DebtAmount</td>
+                        <td>@debt.DueDate.ToString("d")</td>
+                        <td><span class="badge badge-cleared">Cleared</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="no-data">No cleared debts.</p>
+    }
+
+    <h4>Cash Inflows</h4>
+    @if (Inflows.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var inflow in Inflows)
+                {
+                    <tr>
+                        <td>@inflow.Title</td>
+                        <td>@inflow.Amount</td>
+                        <td>@inflow.Date.ToString("d")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="no-data">No cash inflows added yet.</p>
+    }
+
+    <h4>Cash Outflows</h4>
+    @if (Outflows.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var outflow in Outflows)
+                {
+                    <tr>
+                        <td>@outflow.Title</td>
+                        <td>@outflow.Amount</td>
+                        <td>@outflow.Date.ToString("d")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="no-data">No cash outflows added yet.</p>
+    }
+
+
+</section>
+
+@code {
+    private decimal TotalInflows { get; set; }
+    private decimal TotalOutflows { get; set; }
+    private decimal AvailableBalance { get; set; }
+    private decimal TotalDebt { get; set; }
+    private decimal PendingDebt { get; set; }
+    private decimal ClearedDebt { get; set; }
+    private decimal HighestInflow { get; set; }
+    private decimal LowestInflow { get; set; }
+    private decimal HighestOutflow { get; set; }
+    private decimal LowestOutflow { get; set; }
+    private decimal HighestDebt { get; set; }
+    private decimal LowestDebt { get; set; }
+    private int TotalTransactions { get; set; }
+    private decimal NetTotal { get; set; }
+
+    private List<Debt> Debts { get; set; } = new List<Debt>();
+    private List<Transaction> Inflows { get; set; } = new List<Transaction>();
+    private List<Transaction> Outflows { get; set; } = new List<Transaction>();
+
+
+    string InflowFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "cash_inflow.json");
+
+    string OutflowFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "cash_outflow.json");
+
+    string DebtFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "debt.json");
+
+    private List<Debt> PendingDebts => Debts.Where(d => d.DebtAmount > 0).ToList();
+    private List<Debt> ClearedDebts => Debts.Where(d => d.DebtAmount == 0).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Debts = await LoadDebtsFromJson();
+        Inflows = await LoadTransactionsFromJson(InflowFilePath);
+        Outflows = await LoadTransactionsFromJson(OutflowFilePath);
+
+        RecalculateDashboard();
+    }
+
+    private void RecalculateDashboard()
+    {
+        TotalInflows = Inflows.Sum(t => t.Amount);
+        TotalOutflows = Outflows.Sum(t => t.Amount);
+        TotalDebt = Debts.Sum(d => d.DebtAmount);
+        PendingDebt = Debts.Where(d => d.DebtAmount > 0).Sum(d => d.DebtAmount);
+        ClearedDebt = Debts.Where(d => d.DebtAmount == 0).Sum(d => d.DebtAmount);
+
+        HighestInflow = Inflows.Any() ? Inflows.Max(i => i.Amount) : 0;
+        LowestInflow = Inflows.Any() ? Inflows.Min(i => i.Amount) : 0;
+        HighestOutflow = Outflows.Any() ? Outflows.Max(o => o.Amount) : 0;
+        LowestOutflow = Outflows.Any() ? Outflows.Min(o => o.Amount) : 0;
+        HighestDebt = Debts.Any() ? Debts.Max(d => d.DebtAmount) : 0;
+        LowestDebt = Debts.Any() ? Debts.Where(d => d.DebtAmount > 0).DefaultIfEmpty().Min(d => d?.DebtAmount ?? 0) : 0;
+
+        AvailableBalance = TotalInflows - TotalOutflows + PendingDebt;
+        TotalTransactions = Inflows.Count + Debts.Count + Outflows.Count;
+        NetTotal = TotalInflows - TotalOutflows + PendingDebt;
+    }
+
+    private async Task<List<Debt>> LoadDebtsFromJson()
+    {
+        if (System.IO.File.Exists(DebtFilePath))
+        {
+            string jsonString = await System.IO.File.ReadAllTextAsync(DebtFilePath);
+            return System.Text.Json.JsonSerializer.Deserialize<List<Debt>>(jsonString) ?? new List<Debt>();
+        }
+        return new List<Debt>();
+    }
+
+    private async Task<List<Transaction>> LoadTransactionsFromJson(string filePath)
+    {
+        if (System.IO.File.Exists(filePath))
+        {
+            string jsonString = await System.IO.File.ReadAllTextAsync(filePath);
+            return System.Text.Json.JsonSerializer.Deserialize<List<Transaction>>(jsonString) ?? new List<Transaction>();
+        }
+        return new List<Transaction>();
+    }
+
+    public class Transaction
+    {
+        public string Title { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
+    }
+
+    public class Debt
+    {
+        public string DebtSource { get; set; }
+        public decimal DebtAmount { get; set; }
+        public DateTime DueDate { get; set; }
+        public string Description { get; set; }
+    }
+}

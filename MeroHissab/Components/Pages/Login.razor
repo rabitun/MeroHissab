@@ -1,0 +1,162 @@
+﻿@page "/"
+@layout Layout.LoginLayout
+
+@inject NavigationManager Navigation
+
+<div class="container">
+    <!-- Left Side: Login Form -->
+    <div class="login-left">
+        <h1>Log in</h1>
+
+        <!-- Error Message -->
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="error-message">@ErrorMessage</div>
+        }
+
+        <form @onsubmit="HandleSubmit">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" type="text" placeholder="Enter your username" @bind="Username" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Enter your password" @bind="Password" />
+            </div>
+
+            <div class="form-group">
+                <label for="currency">Currency</label>
+                <select id="currency" @bind="CurrencyType">
+                    <option value="NPR">NPR</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="IC">IC</option>
+                    <option value="AUD">AUD</option>
+                    <option value="HKD">HKD</option>
+                </select>
+            </div>
+
+            <button type="submit" class="login-button">Log in</button>
+            
+        </form>
+    </div>
+
+    <!-- Right Side: Image and Illustration -->
+    <div class="login-right">
+        <img src="Images/pig.png" alt="Piggy Bank" class="illustration" />
+    </div>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+    }
+
+    .login-left {
+        flex: 1;
+        background-color: #f5f5f5;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .login-left h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #b6d1a5; /* Soft green border */
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                border: 1px solid #5a7b55; /* Darker green on focus */
+                outline: none;
+            }
+
+    .login-button {
+        background-color: #050552;
+        color: #fff;
+        border: none;
+        padding:0.8rem;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+
+    .login-left p {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .login-left a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+        .login-left a:hover {
+            text-decoration: underline;
+        }
+
+    .error-message {
+        color: red;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .login-right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .login-right .illustration {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+</style>
+
+@code {
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string CurrencyType { get; set; } = "NPR";
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    public void HandleSubmit()
+    {
+        if (Username == "admin" && Password == "admin")
+        {
+            Navigation.NavigateTo("/home");
+        }
+        else
+        {
+            ErrorMessage = "Invalid username or password.";
+        }
+    }
+}

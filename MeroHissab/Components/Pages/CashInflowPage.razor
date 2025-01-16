@@ -1,0 +1,370 @@
+﻿@page "/cashinFlow"
+@inject ITransactionService TransactionService
+@inject NavigationManager NavigationManager
+<h3 style="color: #050552; font-family: Arial, sans-serif; font-weight: bold; text-align: center;">Cash Inflow Management</h3>
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <button @onclick="OpenModal" style="padding: 10px 20px; background-color: #2A3B5F; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease;">
+        Add Cash Inflow
+    </button>
+</div>
+
+@if (IsModalOpen)
+
+
+
+{
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1050;">
+        <div style="background: #ffffff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); width: 700px; max-width: 90%; position: relative; animation: fadeIn 0.3s ease-in-out;">
+            <button type="button" @onclick="CloseModal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 22px; color: #555; cursor: pointer; transition: color 0.3s;">
+                &times;
+            </button>
+            <h4 style="font-family: 'Arial', sans-serif; font-size: 22px; font-weight: bold; color: #050552; text-align: center; margin-bottom: 25px;">Add Cash Inflow</h4>
+            <form @onsubmit="SaveTransaction">
+                <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                    <div style="flex: 1 1 calc(33.33% - 10px);">
+                        <label style="font-size: 14px; font-weight: 600; color: #444;">Title:</label>
+                        <input type="text" @bind="NewTransaction.Title" placeholder="Enter title"
+                               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);"
+                               required />
+                    </div>
+                    <div style="flex: 1 1 calc(33.33% - 10px);">
+                        <label style="font-size: 14px; font-weight: 600; color: #444;">Amount:</label>
+                        <input type="number" @bind="NewTransaction.Amount" placeholder="Enter amount"
+                               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);"
+                               required />
+                    </div>
+                    <div style="flex: 1 1 calc(33.33% - 10px);">
+                        <label style="font-size: 14px; font-weight: 600; color: #444;">Date:</label>
+                        <input type="date" @bind="NewTransaction.Date"
+                               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;"
+                               required />
+                    </div>
+                    <div style="flex: 1 1 calc(33.33% - 10px);">
+                        <label style="font-size: 14px; font-weight: 600; color: #444;">Tags:</label>
+                        <select @bind="NewTransaction.Tag"
+                                style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                            <option value="" disabled>Select a tag</option>
+                            @foreach (var tag in Tags)
+
+
+
+                            {
+                                <option value="@tag">@tag</option>
+                            }
+                        </select>
+                    </div>
+                    <div style="flex: 1 1 calc(33.33% - 10px);">
+                        <label style="font-size: 14px; font-weight: 600; color: #444;">Custom Tag:</label>
+                        <input type="text" @bind="CustomTag" placeholder="Enter custom tag"
+                               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);" />
+                    </div>
+                    <div style="flex: 1 1 calc(33.33% - 10px); display: flex; align-items: flex-end;">
+                        <button type="button" @onclick="AddCustomTag"
+                                style="width: 100%; padding: 12px; background-color: #050552; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background-color 0.3s;">
+                            Add Tag
+                        </button>
+                    </div>
+                    <div style="flex: 1 1 100%;">
+                        <label style="font-size: 14px; font-weight: 600; color: #444;">Notes:</label>
+                        <textarea @bind="NewTransaction.Notes" placeholder="Enter notes"
+                                  style="width: 100%; height: 80px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);"></textarea>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 25px;">
+                    <button type="submit"
+                            style="padding: 12px 25px; background-color: #050552; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.3s;">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+@if (IsModalOpen)
+
+{
+    <div class="modal">
+        <div class="modal-content">
+            <button type="button" @onclick="CloseModal" class="close-button">&times;</button>
+            <h4 style="margin-bottom: 25px; font-size: 24px; font-weight: bold; color: #333; text-align: center;">Add Cash Outflow</h4>
+            <form @onsubmit="SaveTransaction">
+                <div style="display: flex; gap: 20px; margin-bottom: 25px;">
+                    <div style="flex: 1;">
+                        <label>Title:</label>
+                        <input type="text" @bind="NewTransaction.Title" placeholder="Title" required />
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Amount:</label>
+                        <input type="number" @bind="NewTransaction.Amount" placeholder="Amount" required />
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 25px;">
+                    <div style="flex: 1;">
+                        <label>Date:</label>
+                        <input type="date" @bind="NewTransaction.Date" required />
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Tags:</label>
+                        <select @bind="NewTransaction.Tag">
+                            <option value="" disabled>Select a tag</option>
+                            @foreach (var tag in Tags)
+
+                            {
+                                <option value="@tag">@tag</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <label>Notes:</label>
+                <textarea @bind="NewTransaction.Notes" placeholder="Leave a note"></textarea>
+
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <button type="submit" class="button">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+
+
+<h4 style="color: #2A3B5F; font-family: Arial, sans-serif; font-weight: bold; margin-top: 30px;">Cash Inflow Records</h4>
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+    <thead>
+        <tr style="background-color: #050552; color: white;">
+            <th style="padding: 8px; text-align: left;">Title</th>
+            <th style="padding: 8px; text-align: left;">Amount</th>
+            <th style="padding: 8px; text-align: left;">Date</th>
+            <th style="padding: 8px; text-align: left;">Tag</th>
+            <th style="padding: 8px; text-align: left;">Notes</th>
+            <th style="padding: 8px; text-align: left;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Transactions.Any())
+
+
+
+        {
+            @foreach (var transaction in Transactions)
+
+
+
+            {
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px; color: #2A3B5F;">@transaction.Title</td>
+                    <td style="padding: 8px; color: #2A3B5F;">@transaction.Amount</td>
+                    <td style="padding: 8px; color: #2A3B5F;">@transaction.Date.ToShortDateString()</td>
+                    <td style="padding: 8px; color: #2A3B5F;">@transaction.Tag</td>
+                    <td style="padding: 8px; color: #2A3B5F;">@transaction.Notes</td>
+                    <td style="padding: 8px;">
+                        <button @onclick="() => EditTransaction(transaction)"
+                                style="padding: 6px 12px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px;">
+                            Edit
+                        </button>
+                        <button @onclick="() => DeleteTransaction(transaction)"
+                                style="padding: 6px 12px; background-color: #FF4F4F; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+
+        else
+
+        {
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 15px; color: #2A3B5F;">No records found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private bool IsModalOpen { get; set; } = false;
+
+    private Transaction NewTransaction { get; set; } = new Transaction
+        {
+            Title = "",
+            Type = "Credit",
+            Amount = 0,
+            Date = DateTime.Now,
+            Notes = string.Empty
+        };
+
+    private List<string> Tags { get; set; } = new List<string>
+    {
+        "Yearly", "Food", "Gadgets", "Drinks", "Clothes", "Rent", "Monthly", "Fuel", "Party", "EMI", "Miscellaneous"
+    };
+
+    private string CustomTag { get; set; } = string.Empty;
+
+    private List<Transaction> Transactions { get; set; } = new();
+
+
+
+
+    private Transaction selectedTransaction { get; set; } = null;
+
+
+
+    static string Inflow_fileName = "cash_inflow.json";
+
+    string inflow_Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Inflow_fileName);
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        await LoadFromJsonFile();
+
+    }
+
+    private async Task LoadFromJsonFile()
+
+    {
+
+        if (System.IO.File.Exists(inflow_Path))
+
+
+
+        {
+
+            await Task.Run(() =>
+
+            {
+
+                string jsonString = System.IO.File.ReadAllText(inflow_Path);
+
+                Transactions = System.Text.Json.JsonSerializer.Deserialize<List<Transaction>>(jsonString) ?? new List<Transaction>();
+
+            });
+
+
+
+        }
+
+
+
+    }
+
+    private void OpenModal()
+
+    {
+
+        selectedTransaction = null; // Reset for new transaction
+
+        IsModalOpen = true;
+
+    }
+
+    private void CloseModal() => IsModalOpen = false;
+
+    private void AddCustomTag()
+
+    {
+
+        if (!string.IsNullOrWhiteSpace(CustomTag) && !Tags.Contains(CustomTag))
+
+        {
+
+            Tags.Add(CustomTag);
+
+            CustomTag = string.Empty;
+
+        }
+
+    }
+
+    private async Task SaveTransaction()
+
+    {
+
+        Transactions.Add(NewTransaction);
+
+        await SaveToJsonFile();
+
+        CloseModal();
+
+
+
+    }
+
+    private async Task UpdateTransaction()
+
+
+
+    {
+
+        var index = Transactions.FindIndex(t => t == selectedTransaction);
+
+        if (index != -1)
+
+        {
+
+            Transactions[index] = NewTransaction;
+
+            await SaveToJsonFile();
+
+            CloseModal();
+
+        }
+
+    }
+
+    private async Task SaveToJsonFile()
+
+    {
+
+        var jsonString = System.Text.Json.JsonSerializer.Serialize(Transactions);
+
+
+
+
+
+
+
+        System.IO.File.WriteAllText(inflow_Path, jsonString);
+
+        await LoadFromJsonFile();
+
+    }
+
+
+
+    private void EditTransaction(Transaction transaction)
+
+
+
+    {
+
+
+
+        selectedTransaction = transaction;
+
+
+
+        NewTransaction = transaction; // Pre-fill form with selected transaction
+
+        IsModalOpen = true;
+
+
+
+    }
+
+    private async Task DeleteTransaction(Transaction transaction)
+
+
+
+    {
+
+        Transactions.Remove(transaction);
+
+        await SaveToJsonFile();
+
+    }
+}
